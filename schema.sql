@@ -184,3 +184,25 @@ with check (
         and r.status = 'accepted'
     )
 );
+
+drop policy if exists "Authenticated users view skills"
+on public.skills;
+
+create policy "Anyone can view skills"
+on public.skills
+for select
+to anon, authenticated
+using (true);
+
+drop policy if exists "Profiles are publicly readable"
+on public.profiles;
+
+create policy "Profiles are publicly readable"
+on public.profiles
+for select
+to anon, authenticated
+using (true);
+
+-- Limit request updates to the status column
+revoke update on public.exchange_requests from authenticated;
+grant update(status) on public.exchange_requests to authenticated;
