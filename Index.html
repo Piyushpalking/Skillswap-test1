@@ -1,0 +1,247 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#090d18">
+    <meta name="description" content="SkillSwap — Learn skills by exchanging what you know.">
+    <title>SkillSwap — Exchange Skills, Grow Together</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+    <header class="navbar">
+        <a class="brand" href="#">
+            <span class="brand-icon">S</span>
+            SkillSwap<span class="brand-dot">.</span>
+        </a>
+
+        <nav>
+            <a href="#discover">Discover</a>
+            <a href="#how">How it works</a>
+        </nav>
+
+        <div class="nav-actions">
+            <button id="loginNav" class="btn btn-ghost">Log in</button>
+            <button id="signupNav" class="btn btn-primary">Get started</button>
+            <button id="logoutBtn" class="btn btn-ghost hidden">Log out</button>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-content">
+                <span class="eyebrow">✦ YOUR SKILLS HAVE VALUE</span>
+
+                <h1>Learn something.<br>
+                    <span>Teach something.</span><br>
+                    Grow together.
+                </h1>
+
+                <p>
+                    Exchange your knowledge with people around the world.
+                    No expensive courses. Just real people sharing real skills.
+                </p>
+
+                <div class="hero-actions">
+                    <button class="btn btn-primary btn-large" id="heroSignup">
+                        Start swapping →
+                    </button>
+                    <a href="#discover" class="btn btn-ghost btn-large">
+                        Explore skills
+                    </a>
+                </div>
+
+                <div class="hero-stats">
+                    <div><strong>01</strong><span>Share a skill</span></div>
+                    <div><strong>02</strong><span>Find a match</span></div>
+                    <div><strong>03</strong><span>Start learning</span></div>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="visual-card card-one">
+                    <span class="visual-icon">🎨</span>
+                    <div>
+                        <strong>UI Design</strong>
+                        <small>Teaching</small>
+                    </div>
+                </div>
+
+                <div class="visual-card card-two">
+                    <span class="visual-icon">💻</span>
+                    <div>
+                        <strong>Web Development</strong>
+                        <small>Learning</small>
+                    </div>
+                </div>
+
+                <div class="visual-center">⇄</div>
+            </div>
+        </section>
+
+        <section id="how" class="section">
+            <div class="section-heading">
+                <span class="eyebrow">SIMPLE BY DESIGN</span>
+                <h2>Knowledge is better when shared.</h2>
+            </div>
+
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <span>🧠</span>
+                    <h3>Share your skills</h3>
+                    <p>Teach something you already know and help someone grow.</p>
+                </article>
+
+                <article class="feature-card">
+                    <span>🔍</span>
+                    <h3>Discover people</h3>
+                    <p>Find people whose knowledge matches what you want to learn.</p>
+                </article>
+
+                <article class="feature-card">
+                    <span>🤝</span>
+                    <h3>Exchange knowledge</h3>
+                    <p>Connect, communicate and learn through mutual exchange.</p>
+                </article>
+            </div>
+        </section>
+
+        <section id="discover" class="section discover-section">
+            <div class="section-heading">
+                <span class="eyebrow">COMMUNITY</span>
+                <h2>Discover your next skill.</h2>
+                <p>Explore skills shared by the community.</p>
+            </div>
+
+            <div class="search-bar">
+                <input id="skillSearch" type="search"
+                    placeholder="Search programming, design, music...">
+
+                <select id="categoryFilter">
+                    <option value="">All categories</option>
+                    <option value="Technology">Technology</option>
+                    <option value="Design">Design</option>
+                    <option value="Business">Business</option>
+                    <option value="Languages">Languages</option>
+                    <option value="Music">Music</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <button id="searchBtn" class="btn btn-primary">Search</button>
+            </div>
+
+            <div id="skillsGrid" class="skills-grid">
+                <p class="muted">Loading community skills...</p>
+            </div>
+        </section>
+
+        <section id="dashboard" class="section dashboard hidden">
+            <div class="section-heading">
+                <span class="eyebrow">YOUR SPACE</span>
+                <h2>Your dashboard.</h2>
+            </div>
+
+            <div class="dashboard-grid">
+                <article class="panel">
+                    <h3>Your profile</h3>
+                    <p id="userEmail" class="muted"></p>
+
+                    <label for="displayName">Display name</label>
+                    <input id="displayName" placeholder="Your name">
+
+                    <label for="bio">About you</label>
+                    <textarea id="bio" placeholder="Tell people about yourself"></textarea>
+
+                    <button id="saveProfile" class="btn btn-primary">
+                        Save profile
+                    </button>
+                </article>
+
+                <article class="panel">
+                    <h3>Add a skill</h3>
+
+                    <label for="skillName">Skill name</label>
+                    <input id="skillName" placeholder="e.g. JavaScript">
+
+                    <label for="skillType">I want to</label>
+                    <select id="skillType">
+                        <option value="teach">Teach</option>
+                        <option value="learn">Learn</option>
+                    </select>
+
+                    <label for="skillCategory">Category</label>
+                    <select id="skillCategory">
+                        <option value="Technology">Technology</option>
+                        <option value="Design">Design</option>
+                        <option value="Business">Business</option>
+                        <option value="Languages">Languages</option>
+                        <option value="Music">Music</option>
+                        <option value="Other">Other</option>
+                    </select>
+
+                    <button id="addSkill" class="btn btn-primary">
+                        Add skill
+                    </button>
+                </article>
+            </div>
+
+            <div class="panel">
+                <h3>Your skill matches</h3>
+                <div id="matchesList">
+                    <p class="muted">Your potential matches will appear here.</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h3>Exchange requests</h3>
+                <div id="requestsList">
+                    <p class="muted">No requests loaded yet.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <a class="brand" href="#">SkillSwap<span class="brand-dot">.</span></a>
+        <p>Share knowledge. Build connections. Grow together.</p>
+        <small>© 2026 SkillSwap</small>
+    </footer>
+
+    <div id="authModal" class="modal hidden">
+        <div class="modal-box">
+            <button id="closeModal" class="close-btn">×</button>
+
+            <span class="eyebrow">JOIN THE COMMUNITY</span>
+            <h2 id="authTitle">Create your account</h2>
+
+            <form id="authForm">
+                <input id="authName" placeholder="Your name" autocomplete="name">
+                <input id="authEmail" type="email" placeholder="Email address" required>
+                <input id="authPassword" type="password"
+                    placeholder="Password (minimum 8 characters)"
+                    minlength="8" required>
+
+                <button id="authSubmit" class="btn btn-primary btn-full" type="submit">
+                    Create account
+                </button>
+            </form>
+
+            <p id="authSwitch">
+                Already registered?
+                <button id="switchAuth" class="text-btn">Log in</button>
+            </p>
+
+            <p id="authMessage" class="message" aria-live="polite"></p>
+        </div>
+    </div>
+
+    <div id="toast" class="toast" role="status"></div>
+</body>
+</html>
