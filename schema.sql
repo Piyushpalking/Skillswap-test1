@@ -185,6 +185,128 @@ with check (
     )
 );
 
+-- Prevent duplicate requests between the same two users
+create unique index if not exists unique_exchange_pair
+on public.exchange_requests(sender_id, receiver_id);
+
+-- SMART SKILL MATCHING
+create or replace function public.get_skill_matches()
+returns table (
+    user_id uuid,
+    display_name text,
+    bio text,
+    score integer,
+    offers text[],
+    wants text[]
+)
+language sql
+stable
+security invoker
+set search_path = ''
+as $$
+    with my_skills as (
+        select
+            lower(trim(s.name)) as skill_name,
+            s.name,
+            s.category,
+            s.skill_type
+        from public.skills s
+        where s.user_id = auth.uid()
+    ),
+
+    other_skills as (
+        select
+            s.user_id,
+            s.name,
+            lower(trim(s.name)) as skill_name,
+            s.category,
+            s.skill_type
+        from public.skills s
+        where s.user_id <> auth.uid()
+    ),
+
+    candidate_matches as (
+        select
+            o.user_id,
+
+            bool_or(
+                m.skill_type = 'teach'
+                and o.skill_type = 'learn'
+                and m.skill_name = o.skill_name
+            ) as they_can_learn_from_me,
+
+            bool_or(
+                m.skill_type = 'learn'
+                and o.skill_type = 'teach'
+                and m.skill_name = o.skill_name
+            ) as i_can_learn_from_them,
+
+            count(*) filter (
+                where m.skill_type = 'teach'
+                and o.skill_type = 'learn'
+                and m.skill_name = o.skill_name
+            ) as outgoing_matches,
+
+            count(*) filter (
+                where m.skill_type = 'learn'
+                and o.skill_type = 'teach'
+                and m.skill_name = o.skill_name
+            ) as incoming_matches
+
+        from my_skills m
+        join other_skills o
+          on m.skill_name = o.skill_name
+        group by o.user_id
+    ),
+
+    eligible as (
+        select *
+        from candidate_matches
+        where they_can_learn_from_me
+           or i_can_learn_from_them
+    )
+
+    select
+        p.id,
+        p.display_name,
+        p.bio,
+
+        (
+            case
+                when e.they_can_learn_from_me
+                 and e.i_can_learn_from_them then 70
+                else 35
+            end
+            +
+            least(
+                20,
+                (e.outgoing_matches + e.incoming_matches) * 10
+            )
+        )::integer,
+
+        coalesce((
+            select array_agg(distinct s.name)
+            from public.skills s
+            where s.user_id = p.id
+              and s.skill_type = 'teach'
+        ), array[]::text[]),
+
+        coalesce((
+            select array_agg(distinct s.name)
+            from public.skills s
+            where s.user_id = p.id
+              and s.skill_type = 'learn'
+        ), array[]::text[])
+
+    from eligible e
+    join public.profiles p on p.id = e.user_id
+    order by 4 desc, p.display_name asc
+    limit 30;
+$$;
+
+revoke all on function public.get_skill_matches() from public;
+grant execute on function public.get_skill_matches() to authenticated;
+
 drop policy if exists "Authenticated users view skills"
 on public.skills;
 
